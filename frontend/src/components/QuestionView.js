@@ -13,6 +13,8 @@ class QuestionView extends Component {
       totalQuestions: 0,
       categories: {},
       currentCategory: null,
+      context: '',
+      searchTerm: ''
     };
   }
 
@@ -21,6 +23,14 @@ class QuestionView extends Component {
   }
 
   getQuestions = () => {
+    if (this.state.context === "category"){
+      this.getByCategory(this.state.currentCategory, this.state.page)
+      return
+    }
+    if (this.state.context === "search"){
+      this.submitSearch(this.state.searchTerm, this.state.page)
+      return
+    }
     $.ajax({
       url: `/questions?page=${this.state.page}`,
       type: 'GET',
@@ -63,15 +73,17 @@ class QuestionView extends Component {
     return pageNumbers;
   }
 
-  getByCategory = (id) => {
+  getByCategory = (id, page=1) => {
+    if (this.state.currentCategory !== id) this.setState({page:1});
     $.ajax({
-      url: `/categories/${id}/questions`, //TODO: update request URL
+      url: `/categories/${id}/questions?page=${page}`,
       type: 'GET',
       success: (result) => {
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
           currentCategory: result.current_category,
+          context: 'category',
         });
         return;
       },
@@ -82,9 +94,13 @@ class QuestionView extends Component {
     });
   };
 
-  submitSearch = (searchTerm) => {
+  submitSearch = (searchTerm,page) => {
+    if (this.state.searchTerm !== searchTerm) {
+      this.setState({page:1})
+      page = 1
+    };
     $.ajax({
-      url: `/questions/search`,
+      url: `/questions/search?page=${page ? page : this.state.page}`,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
@@ -98,6 +114,8 @@ class QuestionView extends Component {
           questions: result.questions,
           totalQuestions: result.total_questions,
           currentCategory: result.current_category,
+          context: 'search',
+          searchTerm: searchTerm
         });
         return;
       },
