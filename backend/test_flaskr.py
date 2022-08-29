@@ -10,7 +10,7 @@ from models import setup_db, Question, Category
 load_dotenv() # Parses the .env file and then load all the variables found as environment variables.
 database_user = os.environ["DATABASE_USER"]
 database_password = os.environ["DATABASE_PASSWORD"]
-database_name = os.environ["DATABASE_NAME"]
+database_name = os.environ["TEST_DATABASE_NAME"]
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -46,7 +46,7 @@ class TriviaTestCase(unittest.TestCase):
         }
 
         self.quiz_preset_reached = {
-            "previous_questions": [12,23,24,25],
+            "previous_questions": [5,9,12,23],
             "quiz_category": {
                 "type":"History",
                 "id":4
@@ -117,7 +117,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def tests_422_failed_delete_question(self):
         '''Tests failed DELETE question'''
-        res = self.client().delete("/questions/5")
+        res = self.client().delete("/questions/1000")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
@@ -191,23 +191,21 @@ class TriviaTestCase(unittest.TestCase):
     def tests_set_quiz_questions(self):
         '''Tests successful setting of quiz questions'''
         res = self.client().post("/quizzes", json=self.quiz_preset)
-        success = json.loads(res.data)["success"]
-        data = json.loads(res.data)["question"]
-        question = Question.query.get(data["id"])
+        data = json.loads(res.data)
+        question = Question.query.get(data["question"].get("id"))
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(success, True)
+        self.assertEqual(data["success"], True)
         self.assertTrue(question)
 
     def tests_quiz_play_limit_reached(self):
         '''Tests when the quiz play limit has been reached'''
         res = self.client().post("/quizzes", json=self.quiz_preset_reached)
-        success = json.loads(res.data)["success"]
-        data = json.loads(res.data)["question"]
+        data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(success, True)
-        self.assertEqual(data, None)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["question"], None)
     
 
 

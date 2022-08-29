@@ -1,6 +1,3 @@
-from distutils.log import error
-import os
-from unicodedata import category
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -196,7 +193,7 @@ def create_app(test_config=None):
             else:
                 questions = Question.query.filter_by(
                     category=quiz_category["id"]).all()
-            if len(previous_questions) == len(questions):
+            if len(previous_questions) >= len(questions):
                 return jsonify({
                     "success": True,
                     "question": None
