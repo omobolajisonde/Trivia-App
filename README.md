@@ -4,6 +4,8 @@
 
 Trivia app is a web-based trivia gaming application, where users can not only play trivia games but also expand their general knowledge in various fields like `history`, `geography`, `science` etc.
 
+![Trivia main page]("./Trivia.png")
+
 Built as a project in the [Udacity's Full Stack web developer Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd0044)
 
 All backend code follows [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/).
