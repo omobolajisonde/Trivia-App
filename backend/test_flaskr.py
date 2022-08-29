@@ -1,11 +1,16 @@
-import os
 import unittest
 import json
+import os
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
 from flaskr import create_app
 from models import setup_db, Question, Category
 
+load_dotenv() # Parses the .env file and then load all the variables found as environment variables.
+database_user = os.environ["DATABASE_USER"]
+database_password = os.environ["DATABASE_PASSWORD"]
+database_name = os.environ["DATABASE_NAME"]
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -14,9 +19,9 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia_test"
-        self.database_path = "postgresql://{}@{}/{}".format(
-            'bolaji', 'localhost:5432', self.database_name)
+        self.database_name = database_name
+        self.database_path = "postgresql://{}:{}@{}/{}".format(
+            database_user, database_password, 'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_question = {
@@ -58,11 +63,6 @@ class TriviaTestCase(unittest.TestCase):
     def tearDown(self):
         """Executed after reach test"""
         pass
-
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
 
     def tests_get_categories(self):
         '''Tests successful GET categories'''

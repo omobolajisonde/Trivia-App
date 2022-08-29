@@ -380,7 +380,7 @@ curl -X POST http://127.0.0.1:5000/quizzes -H "Content-Type: application/json" -
   "success": true
 }
 ```
-*** OR
+**OR**
 ```json
 {
   "question": null,
