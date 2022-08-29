@@ -130,13 +130,13 @@ Potential error types that could be encountered on failed request
 
 ### Endpoints
 `GET '/categories'`
-- Responds with an object with two keys, `categories` and `categories_` whose values are a dictionary of the categories (key:id and value:category string) and a list of category dictionaries respectively.
+- Responds with an object with three keys, `success`, `categories` and `categories_` whose values are a boolean, a dictionary of the categories (key:id and value:category string) and a list of category dictionaries respectively.
 - Sample
 ```bash
 curl http://127.0.0.1:5000/categories
 ```
 - Response (JSON)
-```
+```json
 {
   "categories": {
     "1": "Science",
@@ -176,6 +176,220 @@ curl http://127.0.0.1:5000/categories
 }
 ```
 
-`GET '/questions'`
-- 
+---
+
+`GET '/questions?page={integer}'`
+
+- Fetches a paginated set of questions, a total number of questions, a success state, all categories and current category id.
+- Request Arguments: `page` - integer
+- Returns: An object with 10 paginated questions, total questions, object including all categories, and current category id.
+- Sample
+```bash
+curl http://127.0.0.1:5000/questions?page=1
+```
+- Response (JSON)
+```json
+{
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "current_category": null,
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+  ],
+  "success": true,
+  "total_questions": 27
+}
+```
+
+---
+
+`GET '/categories/{id}/questions'`
+
+- Fetches questions for a cateogry specified by id request argument
+- Request Arguments: `id` - integer
+- Returns: An object with questions for the specified category, total questions, current category id and a success value
+- Sample
+```bash
+curl http://127.0.0.1:5000/categories/1/questions
+```
+- Response (JSON)
+```json
+{
+  "current_category": 1,
+  "questions": [
+    {
+      "answer": "The Liver",
+      "category": 1,
+      "difficulty": 4,
+      "id": 20,
+      "question": "What is the heaviest organ in the human body?"
+    },
+    {
+      "answer": "Alexander Fleming",
+      "category": 1,
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    },
+    {
+      "answer": "Blood",
+      "category": 1,
+      "difficulty": 4,
+      "id": 22,
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    },
+    {
+      "answer": "Jupiter",
+      "category": 1,
+      "difficulty": 2,
+      "id": 32,
+      "question": "What is the largest planet in the solar system?"
+    }
+  ],
+  "success": true,
+  "total_questions": 4
+}
+
+---
+
+```
+`DELETE '/questions/${id}'`
+
+- Deletes a specified question using the id of the question
+- Request Arguments: `id` - integer
+- Returns: A success value and the id of the deleted question
+- Sample
+```bash
+curl -X DELETE http://127.0.0.1:5000/questions/5
+```
+- Response (JSON)
+```json
+{
+  "deleted": 5,
+  "success": true
+}
+```
+---
+`POST '/questions'`
+
+- Sends a post request in order to add a new question
+- Request Body:
+
+```json
+{
+  "question": "Heres a new question string",
+  "answer": "Heres a new answer string",
+  "difficulty": 1,
+  "category": 3
+}
+```
+- Returns: A success value and the id of the created question
+- Sample
+```bash
+curl -X POST http://127.0.0.1:5000/questions -H "Content-Type: application/json" -d '{"question":"What is the name of the longest river in Africa?", "answer":"The Nile River", "difficulty":"4", "category":"3"}'
+```
+- Response (JSON)
+```json
+{
+  "created": 36,
+  "success": true
+}
+```
+
+---
+
+`POST '/questions/search'`
+
+- Sends a post request in order to search for a specific question by search term
+- Request Body:
+
+```json
+{
+  "searchTerm": "this is the term the user is looking for"
+}
+```
+
+- Returns: any array of questions, a number of totalQuestions that met the search term, a success value and the current category id
+- Sample
+```bash
+curl -X POST http://127.0.0.1:5000/questions/search -H "Content-Type: application/json" -d '{"searchTerm":"won"}'
+```
+- Response (JSON)
+```json
+{
+  "current_category": null,
+  "questions": [
+    {
+      "answer": "Uruguay",
+      "category": 6,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    }
+  ],
+  "success": true,
+  "total_questions": 1
+}
+```
+---
+
+`POST '/quizzes'`
+
+- Sends a post request in order to get the next question
+- Request Body:
+
+```json
+{
+  "previous_questions": [9,12],
+  "quiz_category": {
+    "id": 4,
+    "type": "History"
+  }
+}
+```
+
+- Returns: a single new question object or a question value of none (when the category has no more unique question or when play limit has been reached) and a success value
+- Sample
+```bash
+curl -X POST http://127.0.0.1:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions": [9, 12],"quiz_category": {"id": 4,"type": "History"}}'
+```
+- Response (JSON)
+```json
+{
+  "question": {
+    "answer": "Scarab",
+    "category": 4,
+    "difficulty": 4,
+    "id": 23,
+    "question": "Which dung beetle was worshipped by the ancient Egyptians?"
+  },
+  "success": true
+}
+```
+*** OR
+```json
+{
+  "question": null,
+  "success": true
+}
+```
+## Deployment N/A
+
+## Authors
+[Sonde Omobolaji](https://github.com/omobolajisonde) 
+
+## Acknowledgements 
+The awesome team at Udacity and my dear [Coach Caryn McCarthy](https://www.linkedin.com/in/carynmccarthy)
 
