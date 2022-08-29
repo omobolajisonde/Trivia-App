@@ -24,21 +24,21 @@ All backend code follows [PEP8 style guidelines](https://www.python.org/dev/peps
   ```sh
   ├── README.md
   ├── backend
-  |   ├── flaskr
-  |   |    ├── __init__.py
-  |   ├── models.py
-  |   ├── requirements.txt *** The dependencies to be installed with "pip install -r requirements.txt"
-  |   ├── test_flaskr.py *** contains code for testing the api endpoints.
-  |   └── trivia.psql *** contains instructions for populating the database.
+  │   ├── flaskr
+  │   │   ├── __init__.py
+  │   ├── models.py
+  │   ├── requirements.txt *** The dependencies to be installed with "pip install -r requirements.txt"
+  │   ├── test_flaskr.py *** contains code for testing the api endpoints.
+  │   └── trivia.psql *** contains instructions for populating the database.
   ├── frontend
   │   ├── public
-  │   |   ├── index.html
+  │   │   ├── index.html
   └── ├── src
-      |   ├── components
-      |   ├── stylesheets
-      |   ├── App.js
-      |   ├── App.test.js
-      |   ├── index.js
+      │   ├── components
+      │   ├── stylesheets
+      │   ├── App.js
+      │   ├── App.test.js
+      │   ├── index.js
       └──  package.json
   ```
 
@@ -104,6 +104,7 @@ createdb bookshelf_test
 psql bookshelf_test < books.psql
 python test_flaskr.py
 ```
+>**Note** - All tests are in the `test_flaskr.py` file.
 
 # API REFERENCE
 ### Getting Started
@@ -130,7 +131,8 @@ Potential error types that could be encountered on failed request
 
 ### Endpoints
 `GET '/categories'`
-- Responds with an object with three keys, `success`, `categories` and `categories_` whose values are a boolean, a dictionary of the categories (key:id and value:category string) and a list of category dictionaries respectively.
+- Returns: two categories objects (with different format of the categories), `categories` and `categories_` whose values are a dictionary of the categories (key:id and value:category string) and a list of category dictionaries respectively and a success value.
+- Request parameter: None
 - Sample
 ```bash
 curl http://127.0.0.1:5000/categories
@@ -181,8 +183,8 @@ curl http://127.0.0.1:5000/categories
 `GET '/questions?page={integer}'`
 
 - Fetches a paginated set of questions, a total number of questions, a success state, all categories and current category id.
-- Request Arguments: `page` - integer
-- Returns: An object with 10 paginated questions, total questions, object including all categories, and current category id.
+- Request Arguments (optional): `page` - integer (default `page` is `1`)
+- Returns: A list of 10 questions (based on the current page), total questions, categories object (including all categories), and current category id.
 - Sample
 ```bash
 curl http://127.0.0.1:5000/questions?page=1
@@ -217,9 +219,10 @@ curl http://127.0.0.1:5000/questions?page=1
 
 `GET '/categories/{id}/questions'`
 
-- Fetches questions for a cateogry specified by id request argument
+- Fetches questions for a cateogry based on the id in the URL
 - Request Arguments: `id` - integer
-- Returns: An object with questions for the specified category, total questions, current category id and a success value
+- Request Arguments (optional): `page` - integer (default `page` is `1`)
+- Returns: A list of questions (paginated) for the specified category, total questions, current category id and a success value
 - Sample
 ```bash
 curl http://127.0.0.1:5000/categories/1/questions
@@ -261,13 +264,12 @@ curl http://127.0.0.1:5000/categories/1/questions
   "success": true,
   "total_questions": 4
 }
-
+```
 ---
 
-```
-`DELETE '/questions/${id}'`
+`DELETE '/questions/{id}'`
 
-- Deletes a specified question using the id of the question
+- Deletes a specific question based on the id in the url
 - Request Arguments: `id` - integer
 - Returns: A success value and the id of the deleted question
 - Sample
@@ -289,9 +291,9 @@ curl -X DELETE http://127.0.0.1:5000/questions/5
 
 ```json
 {
-  "question": "Heres a new question string",
-  "answer": "Heres a new answer string",
-  "difficulty": 1,
+  "question": "What is the name of the longest river in Africa?",
+  "answer": "The Nile River",
+  "difficulty": 4,
   "category": 3
 }
 ```
@@ -312,16 +314,16 @@ curl -X POST http://127.0.0.1:5000/questions -H "Content-Type: application/json"
 
 `POST '/questions/search'`
 
-- Sends a post request in order to search for a specific question by search term
+- Sends a post request in order to query for a specific question by search term
 - Request Body:
 
 ```json
 {
-  "searchTerm": "this is the term the user is looking for"
+  "searchTerm": "substring of the question the user is looking for"
 }
 ```
 
-- Returns: any array of questions, a number of totalQuestions that met the search term, a success value and the current category id
+- Returns: a list of questions, a number of total questions that met the search term, a success value and the current category id
 - Sample
 ```bash
 curl -X POST http://127.0.0.1:5000/questions/search -H "Content-Type: application/json" -d '{"searchTerm":"won"}'
@@ -347,7 +349,7 @@ curl -X POST http://127.0.0.1:5000/questions/search -H "Content-Type: applicatio
 
 `POST '/quizzes'`
 
-- Sends a post request in order to get the next question
+- Sends a post request in order to get the next quiz question.
 - Request Body:
 
 ```json
@@ -360,7 +362,7 @@ curl -X POST http://127.0.0.1:5000/questions/search -H "Content-Type: applicatio
 }
 ```
 
-- Returns: a single new question object or a question value of none (when the category has no more unique question or when play limit has been reached) and a success value
+- Returns: a new question object or a question value of none (when the category has no more unique question or when play limit has been reached) and a success value.
 - Sample
 ```bash
 curl -X POST http://127.0.0.1:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions": [9, 12],"quiz_category": {"id": 4,"type": "History"}}'
